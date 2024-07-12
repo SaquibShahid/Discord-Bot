@@ -15,7 +15,6 @@ const commands = [
 
 
 const rest = new REST().setToken(process.env.DISCORD_TOKEN);
-// console.log(rest);
 
 (async () => {
 	try {

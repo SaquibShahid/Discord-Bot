@@ -1,7 +1,12 @@
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 const dotenv = require('dotenv');
+const { getData } = require('./slash.command.helpers/random.pic');
+const { generateShortUrl } = require('./slash.command.helpers/url.shortner');
 dotenv.config();
+
 require('./command');
+require('./models/conn');
+require('./server');
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
@@ -9,26 +14,30 @@ client.once(Events.ClientReady, readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 
-let data = null;
-const getData = async () => {
-    const response = await fetch(`https://api.unsplash.com/photos/random?client_id=${process.env.UNSPLASH_API_KEY}`)
-    data = await response.json();
-    return data.urls.regular;
-}
-
 
 // generating message responses
 
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
-    if (["Hi" , "hi" , "Hello" , "hello" , "hey" , "Hey"].includes(message.content)) {
+    if (["Hi", "hi", "Hello", "hello", "hey", "Hey"].includes(message.content)) {
         return message.reply({
             content: "Hello from Saquib's Bot",
         })
     }
-    message.reply({
-        content: "I don't get you , I'm still getting trained..."
-    })
+    if (message.content.startsWith("shortenUrl")) {
+        generateShortUrl(message.content.split("shortenUrl")[1]).then((shortenURL) => {
+            return message.reply({
+                content: "Shorten Url " + `http://192.168.1.198:5000/url/${shortenURL}`
+            })
+        }).catch((e) => {
+            console.log(e.message);
+        })
+    }
+    else {
+        message.reply({
+            content: "I don't get you , I'm still getting trained..."
+        })
+    }
 })
 
 
@@ -45,12 +54,11 @@ client.on("interactionCreate", (interaction) => {
             interaction.reply({
                 content: pic
             })
-        }).catch((e)=>{
+        }).catch((e) => {
             interaction.reply({
-                content : "Failed to generate random Image"
+                content: "Failed to generate random Image"
             })
         })
-
     }
 })
 

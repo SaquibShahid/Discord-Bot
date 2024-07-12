@@ -21,6 +21,5 @@ exports.redirectUrl = async(req, res) =>{
             }
         }
     });
-    console.log(urlData);
     res.redirect(urlData.redirectUrl.trim());
 }
